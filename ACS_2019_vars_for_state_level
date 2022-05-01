@@ -1,0 +1,143 @@
+#### ACS 2019 Variables used for State Level MrP Predictions ####
+
+
+# Gender and Race####
+B01001A_002	# White male
+B01001A_017 # White woman
+B01001B_002 # Black male
+B01001B_017 # Black woman
+B01001C_002 # Alaskan native male
+B01001C_017 # Alaskan native female
+B01001D_002 # Asian male
+B01001D_017	# Asian female
+B01001E_002 # Hawaii pacific islander male
+B01001E_017 # Hawaii pacific islander female
+B01001F_002 # Other male
+B01001F_017 # Other female
+B01001G_002	# 2+ male
+B01001G_017 # 2+ female
+B01001I_002 # Hispanic male
+B01001I_017 # Hispanic female
+
+# Race ####
+B01001A_001 # White
+B01001B_001 # Black
+B01001C_001 # Alaskan
+B01001D_001 # Asian
+B01001E_001 # Hawaii
+B01001F_001 # Other
+B01001G_001 # 2+ 
+B01001I_001 # Hispanic
+
+# Gender ####
+B01001_002 # Male
+B01001_026 # Female
+
+# Male ####
+B01001_007 #18-19
+B01001_008 # 20
+B01001_009 # 21
+B01001_010 # 22-24
+B01001_011 # 25-29
+B01001_012 # 30-34
+B01001_013 # 35-39
+B01001_014 # 40-44
+B01001_015 # 45-49
+B01001_016 # 50-54
+B01001_017 # 55-59
+B01001_018 # 60-61
+B01001_019 # 62-64
+B01001_019 # 66-66
+B01001_021 # 67-69
+B01001_022 # 70-74
+B01001_023 # 75-79
+B01001_024 # 80-84
+B01001_025 # 85+ 
+
+# Female ####
+B01001_031 # 18-19
+B01001_032 # 20
+B01001_033 # 21
+B01001_034 #22-24
+B01001_035 # 25-29
+B01001_036 # 30-34
+B01001_037 # 35-39
+B01001_038 # 40-44
+B01001_039 # 45-49
+B01001_040 # 50-54
+B01001_041 # 55-59
+B01001_042 # 60 - 61
+B01001_043 # 62-64
+B01001_044 # 65-66
+B01001_045 #67-69
+B01001_046 # 70-74
+B01001_047 # 75-49
+B01001_048 # 80-84
+B01001_049 # 85+
+
+#Male EDU
+B15002_003 # none
+B15002_004 # 4th
+B15002_005 # 6th
+B15002_006 # 8th
+B15002_007 # 9th
+B15002_008 # 10th
+B15002_009 # 11th
+B15002_010 # 12th but no diploma
+B15002_011 # HS grad
+B15002_012 # some college 1
+B15002_013 # some college 1 + 
+B15002_014 # associates
+B15002_015 # bachelors
+B15002_016 # masters
+B15002_017 # professional
+B15002_018 # doctorate
+
+#Female EDU ####
+B15002_020 # none
+B15002_021 # 4th
+B15002_022 #6th
+B15002_023 #8th
+B15002_024 # 9th
+B15002_025 # 10th
+B15002_026 #11th
+B15002_027 # 12th no dimploma
+B15002_028 #  HS grad
+B15002_029 # some college 1
+B15002_030 # some college 1 + 
+B15002_031 # associates
+B15002_032 # bachelors
+B15002_033 # masters
+B15002_034 # professional
+B15002_035 # doctorate
+
+# HHI ####
+B19001_002 # 10k
+B19001_003 # 15k
+B19001_004 #20k
+B19001_005 #25k
+B19001_006 #30k
+B19001_007 #35k
+B19001_008 #40k
+B19001_009 #45k
+B19001_010 #50k
+B19001_011 #60k
+B19001_012 #75k
+B19001_013 #100k
+B19001_014 #125k
+B19001_015 # 150k
+B19001_016 #200k
+B19001_017 # +200k+
+
+
+# Employment ####
+B23025_002 # in labor force
+B23025_003 #civilian labor force
+B23025_004 # civilian labor force (employed and armed forces)
+B23025_005 # civilian labor force (unemployed)
+B23025_006 # armed forces
+B23025_007 # not in labor force
+B14002_003 # male in school
+B14002_027 #female in school
+
+
