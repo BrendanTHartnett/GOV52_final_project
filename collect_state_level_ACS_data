@@ -1,5 +1,7 @@
 library(purrr)
 library(tidycensus)
+#Install tidycensus from Walkerke
+  # remotes::install_github("walkerke/tidycensus")
 library(dplyr)
 
 #Census Key
