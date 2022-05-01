@@ -11,6 +11,14 @@ library(dplyr)
 #Load all 2019 ACS variable names, labels and descriptions
 variables_2019 <- load_variables(2019, "acs5", cache = TRUE)
 
+#Create string of U.S. States
+head(tidycensus::fips_codes)
+us <- unique(fips_codes$state)[1:51]
+
+#Create state targets (all)
+my_states <- fips_codes %>%
+  filter(state %in% us)
+
 #Generate sexXgender targets for over 18 by age 
 sexXgender18p_vars <-  c(
   whiteM1819 = "B01001A_007",
@@ -175,6 +183,11 @@ sexXgender18p_vars <-  c(
   hisF85 = "B01001I_031"
 )
 
+table(srdat$hisM1819)
+
+
+
+
 
 #Retrieve sexXrace data for those over 18 at state level
 sexXrace18 <- map_dfr(
@@ -188,8 +201,102 @@ sexXrace18 <- map_dfr(
 )
 
 
+#Compile data for age, sex and race  
+#Group by state
+sexXrace182 <- sexXrace18 %>%
+  group_by(NAME) %>%
+  summarize(SUM = sum(estimate, na.rm=TRUE))
+sexX <- merge(sexXrace18, sexXrace182, by.x="NAME", by.y="NAME")
+sexX <- sexX%>%
+  select(NAME, variable, estimate)
+head(sexX)
+srdat <- sexX %>%
+  group_by(NAME, variable) %>%
+  summarize(Evar = sum(estimate, na.rm=TRUE))
+srdat <- srdat %>%
+  pivot_wider(names_from = variable, values_from = Evar)
+#Recode to just races and gender
+srdat$WHITEMALE <- 0
+srdat$WHITEMALE <- srdat$whiteM1819 + srdat$whiteM2024 + srdat$whiteM2529 + srdat$whiteM3034 + srdat$whiteM3544 + srdat$whiteM4554 + srdat$whiteM5564 + srdat$whiteM6574 + srdat$whiteM7584
+srdat$WHITEFEMALE <- 0
+srdat$WHITEFEMALE <- srdat$whiteF1819 + srdat$whiteF2024 + srdat$whiteF2529 + srdat$whiteF3034 + srdat$whiteF3544 + srdat$whiteF4554 + srdat$whiteF5564 + srdat$whiteF6574 + srdat$whiteF7584 + srdat$whiteF85
+srdat$BLACKMALE <- 0
+srdat$BLACKMALE <- srdat$blackM1819 + srdat$blackM2024 + srdat$blackM2529 + srdat$blackM3034 + srdat$blackM3544 + srdat$blackM4554 + srdat$blackM5564 + srdat$blackM6574 + srdat$blackM7584
+srdat$BLACKFEMALE <- 0
+srdat$BLACKFEMALE <- srdat$blackF1819 + srdat$blackF2024 + srdat$blackF2529 + srdat$blackF3034 + srdat$blackF3544 + srdat$blackF4554 + srdat$blackF5564 + srdat$blackF6574 + srdat$blackF7584 + srdat$blackF85
+srdat$INDIANMALE <- 0
+srdat$INDIANMALE <- srdat$indM1819 + srdat$indM2024 + srdat$indM2529 + srdat$indM3034 + srdat$indM3544 + srdat$indM4554 + srdat$indM5564 + srdat$indM6574 + srdat$indM7584 + srdat$indM85
+srdat$INDIANFEMALE <- 0
+srdat$INDIANFEMALE <- srdat$indF1819 + srdat$indF2024 + srdat$indF2529 + srdat$indF3034 + srdat$indF3544 + srdat$indF4554 + srdat$indF5564 + srdat$indF6574 + srdat$indF7584 + srdat$indF85
+srdat$ASIANMALE <- 0
+srdat$ASIANMALE <- srdat$asiM1819 + srdat$asiM2024 + srdat$asiM2529 + srdat$asiM3034 + srdat$asiM3544 + srdat$asiM4554 + srdat$asiM5564 + srdat$asiM6574 + srdat$asiM7584 + srdat$asiM85
+srdat$ASIANFEMALE <- 0
+srdat$ASIANFEMALE <- srdat$asiF1819 + srdat$asiF2024 + srdat$asiF2529 + srdat$asiF3034 + srdat$asiF3544 + srdat$asiF4554 + srdat$asiF5564 + srdat$asiF6574 + srdat$asiF7584 + srdat$asiF85
+table(srdat$ASIANFEMALE)
+srdat$NATIVEMALE <- 0
+srdat$NATIVEMALE <- srdat$natM1819 + srdat$natM2024 + srdat$natM2529 + srdat$natM3034 + srdat$natM3544 + srdat$natM4554 + srdat$natM5564 + srdat$natM6574 + srdat$natM7584 + srdat$natM85
+srdat$NATIVEFEMALE <- 0
+srdat$NATIVEFEMALE <- srdat$natF1819 + srdat$natF2024 + srdat$natF2529 + srdat$natF3034 + srdat$natF3544 + srdat$natF4554 + srdat$natF5564 + srdat$natF6574 + srdat$natF7584 + srdat$natF85
+srdat$OTMALE <- 0 
+srdat$OTMALE <- srdat$othM1819 + srdat$othM2024 + srdat$othM2529 + srdat$othM3034 + srdat$othM3544 + srdat$othM4554 + srdat$othM5564 + srdat$othM6574 + srdat$othM7584 + srdat$othM85
+srdat$OTFEMALE <- 0
+srdat$OTFEMALE <- srdat$othF1819 + srdat$othF2024 + srdat$othF2529 + srdat$othF3034 + srdat$othF3544 + srdat$othF4554 + srdat$othF5564 + srdat$othF6574 + srdat$othF7584 + srdat$othF85
+srdat$TWOMALE <- 0
+srdat$TWOMALE <- srdat$twoM1819 + srdat$twoM2024 + srdat$twoM2529 + srdat$twoM3034 + srdat$twoM3544 + srdat$twoM4554 + srdat$twoM5564 + srdat$twoM6574 + srdat$twoM7584 + srdat$twoM85
+srdat$TWOFEMALE <- 0
+srdat$TWOFEMALE <- srdat$twoF1819 + srdat$twoF2024 + srdat$twoF2529 + srdat$twoF3034 + srdat$twoF3544 + srdat$twoF4554 + srdat$twoF5564 + srdat$twoF6574
+srdat$HISPANICMALE <- 0
+srdat$HISPANICMALE <- srdat$hisM1819 + srdat$hisM2024 + srdat$hisM2529 + srdat$hisM3034 + srdat$hisM3544 + srdat$hisM4554 + srdat$hisM5564 + srdat$hisM6574 + srdat$hisM7584
+srdat$HISPANICFEMALE <- 0
+srdat$HISPANICFEMALE <- srdat$hisF1819 + srdat$hisF2024 + srdat$hisF2529 + srdat$hisF3034 + srdat$hisF3544 + srdat$hisF4554 + srdat$hisF5564 + srdat$hisF6574 + srdat$hisF7584 + srdat$hisF85
+srdat$OTHERMALE <- srdat$INDIANMALE + srdat$NATIVEMALE + srdat$OTMALE + srdat$TWOMALE
+srdat$OTHERFEMALE <- srdat$INDIANFEMALE + srdat$NATIVEFEMALE + srdat$OTFEMALE + srdat$TWOFEMALE
+head(srdat)
 
-#Genderate education by gender targets
+
+
+## Age ####
+srdat$under25 <- 0
+srdat$under25 <- srdat$whiteM1819 + srdat$whiteM2024 + srdat$whiteF1819 + srdat$whiteF2024 + srdat$blackM1819 + srdat$blackM2024 + srdat$blackF1819 + srdat$blackF2024 +  srdat$indM1819 + srdat$indM2024 + srdat$indF1819 + srdat$indF2024 + srdat$asiM1819 + srdat$asiM2024 + srdat$asiF1819 + srdat$asiF2024 + srdat$natM1819 + srdat$natM2024 + srdat$natF1819 + srdat$natF2024 + srdat$othM1819 + srdat$othM2024 + srdat$othF1819 + srdat$othF2024 + srdat$twoM1819 + srdat$twoM2024 + srdat$twoF1819 + srdat$twoF2024 + srdat$hisM1819 + srdat$hisM2024  + srdat$hisF1819 + srdat$hisF2024
+srdat$under35 <- 0
+srdat$under35 <- srdat$whiteM2529 + srdat$whiteM3034  + srdat$whiteF2529 + srdat$whiteF3034 + srdat$blackM2529 + srdat$blackM3034 + srdat$blackF2529 + srdat$blackF3034 + srdat$indM2529 + srdat$indM3034 + srdat$indF2529 + srdat$indF3034  + srdat$asiM2529 + srdat$asiM3034 + srdat$asiF2529 + srdat$asiF3034 + srdat$natM2529 + srdat$natM3034 + srdat$natF2529 + srdat$natF3034 + srdat$othM2529 + srdat$othM3034  + srdat$othF2529 + srdat$othF3034 + srdat$twoM2529 + srdat$twoM3034 + srdat$twoF2529 + srdat$twoF3034 + srdat$hisM2529 + srdat$hisM3034 + srdat$hisF2529 + srdat$hisF3034
+srdat$under55 <- 0
+srdat$under55 <- srdat$whiteM3544 + srdat$whiteM4554 + srdat$whiteF3544 + srdat$whiteF4554 + srdat$blackM3544 + srdat$blackM4554 + srdat$blackF3544 + srdat$blackF4554 + srdat$indM3544 + srdat$indM4554 + srdat$indF3544 + srdat$indF4554 + srdat$asiM3544 + srdat$asiM4554 + srdat$asiF3544 + srdat$asiF4554 + srdat$natM3544 + srdat$natM4554 + srdat$natF3544 + srdat$natF4554 + srdat$othM3544 + srdat$othM4554 + srdat$othF3544 + srdat$othF4554 + srdat$twoM3544 + srdat$twoM4554 + srdat$twoF3544 + srdat$twoF4554 + srdat$hisM3544 + srdat$hisM4554 + srdat$hisF3544 + srdat$hisF4554 
+srdat$under65 <- 0
+srdat$under65 <- srdat$whiteM5564 + srdat$whiteF5564 + srdat$blackM5564 + srdat$blackF5564 + srdat$indM5564 + srdat$indF5564 +srdat$asiF5564  + srdat$asiM5564 + srdat$natM5564 + srdat$natF5564  + srdat$othM5564 + srdat$othF5564  + srdat$twoM5564 + srdat$twoF5564  + srdat$hisM5564 + srdat$hisF5564
+srdat$under99 <- 0
+srdat$under99 <-  srdat$whiteM6574 + srdat$whiteM7584 + srdat$whiteM85  + srdat$whiteF6574 + srdat$whiteF7584 + srdat$whiteF85 + srdat$blackM6574 + srdat$blackM7584 + srdat$blackM85 + srdat$blackF6574 + srdat$blackF7584 + srdat$blackF85  + srdat$indM6574 + srdat$indM7584 + srdat$indM85  + srdat$indF6574 + srdat$indF7584 + srdat$indF85  + srdat$asiM6574 + srdat$asiM7584 + srdat$asiM85 + srdat$asiF6574 + srdat$asiF7584 + srdat$asiF85  + srdat$natM6574 + srdat$natM7584 + srdat$natM85 + srdat$natF6574 + srdat$natF7584 + srdat$natF85 + srdat$othM6574 + srdat$othM7584 + srdat$othM85 + srdat$othF6574 + srdat$othF7584 + srdat$othF85 + srdat$twoM6574 + srdat$twoM7584 + srdat$twoM85 + srdat$twoF6574 + srdat$hisM6574 + srdat$hisM7584 + srdat$hisM85  + srdat$hisF6574 + srdat$hisF7584 + srdat$hisF85
+#Make into general categories
+srdat$under35 <- srdat$under25 + srdat$under35
+srdat$under55 <- srdat$under55
+srdat$under65 <- srdat$under65
+#make sum variable
+srdat$TOTAL <- srdat$under35 + srdat$under55 + srdat$under65 + srdat$under99
+#make percentage
+srdat$under35 <- srdat$under35/srdat$TOTAL
+srdat$under55 <- srdat$under55/srdat$TOTAL
+srdat$under65 <- srdat$under65/srdat$TOTAL
+srdat$under99 <- srdat$under99/srdat$TOTAL
+
+#also divide race by total
+srdat$WHITEMALE <- srdat$WHITEMALE/srdat$TOTAL
+srdat$WHITEFEMALE <- srdat$WHITEFEMALE/srdat$TOTAL
+srdat$BLACKMALE <- srdat$BLACKMALE/srdat$TOTAL
+srdat$BLACKFEMALE <- srdat$BLACKFEMALE/srdat$TOTAL
+srdat$HISPANICMALE <- srdat$HISPANICMALE/srdat$TOTAL
+srdat$HISPANICFEMALE <- srdat$HISPANICFEMALE/srdat$TOTAL
+
+srdat1 <- srdat %>%
+  select(NAME, under35, under55, under65, WHITEMALE, WHITEFEMALE, BLACKMALE, BLACKFEMALE, HISPANICFEMALE, HISPANICMALE)
+srdat1
+srdat <- srdat1
+
+srdat
+
+
+
+
+### EDUCATION #### 
 edu_vars_gen <- c(
   Mnone = "B15002_003",
   M4 = "B15002_004",
@@ -225,55 +332,176 @@ edu_vars_gen <- c(
   FDr = "B15002_035"
 )
 
-#Retrieve eduXgender data at the state level
-eduXgender <- get_acs(
-  geography = "state",
-  variables = edu_vars_gen,
-  summary_var = "B09021_001"
-)
+edudat <- get_acs(geography = "state", 
+                  variables = edu_vars_gen, 
+                  year = 2019)
+
+eduXgender <- edudat
+
+eduXgenderDat <- eduXgender %>%
+  group_by(NAME, variable) %>%
+  summarize(Evar = sum(estimate, na.rm=TRUE))
+eduXgenderDat
+eduXgenderDat1 <- eduXgenderDat %>%
+  pivot_wider(names_from = variable, values_from = Evar)
+eduXgenderDat1
+
+edudat <- eduXgenderDat1
 
 
-#Generate targets for Household Income
-hhi_vars <- c(
-  L10k = "B19001_002", #L for less than
-  L15 = "B19001_003",
-  L20 = "B19001_004",
-  L25 = "B19001_005",
-  L30 = "B19001_006",
-  L35 = "B19001_007",
-  L40 = "B19001_008",
-  L45 = "B19001_009",
-  L50 = "B19001_010",
-  L60 = "B19001_011",
-  L75 = "B19001_012",
-  L100 = "B19001_013",
-  L125 = "B19001_014",
-  L150 = "B19001_015",
-  L200 = "B19001_016",
-  O200 = "B19001_017" #O for over
-)
+edudat$FlessthanHS <- edudat$Fnone +  edudat$F4 + edudat$F6 + edudat$F8 + edudat$F9 + edudat$F10 + edudat$F11 + edudat$F12
+table(edudat$FlessthanHS)
+edudat$Fhighschool <- edudat$FHS
+edudat$Fsomecollege <- edudat$FC1 + edudat$FC2 + edudat$FAss
+edudat$Fbachelorsdegree <- edudat$FBachelors
+table(edudat$Fbachelorsdegree)
+edudat$Fgradschool <- edudat$FProf + edudat$FDr + edudat$FMasters
+table(edudat$Fgradschool)
 
-#Retrieve household income data at state level
-hhi <- get_acs(
-  geography = "state",
-  variables = hhi_vars,
-  summary_var = "B09021_001"
-)
+edudat$MlessthanHS <- edudat$Mnone +  edudat$M4 + edudat$M6 + edudat$M8 + edudat$M9 + edudat$M10 + edudat$M11 + edudat$M12
+table(edudat$MlessthanHS)
+edudat$Mhighschool <- edudat$MHS
+edudat$highschool <- edudat$MlessthanHS + edudat$Mhighschool + edudat$Fhighschool + edudat$FlessthanHS
+edudat$Msomecollege <- edudat$MC1 + edudat$MC2 + edudat$MAss
+edudat$Mbachelorsdegree <- edudat$MBachelors
+table(edudat$Mbachelorsdegree)
+edudat$Mgradschool <- edudat$MProf + edudat$MDr + edudat$MMasters
+table(edudat$Mgradschool)
 
+edudat$TOTALEDU <- edudat$MlessthanHS + edudat$Mhighschool + edudat$Msomecollege + edudat$Mbachelorsdegree + edudat$Mgradschool + edudat$FlessthanHS + edudat$Fhighschool + edudat$Fsomecollege + edudat$Fbachelorsdegree + edudat$Fgradschool
+edudat$highschool <- edudat$highschool/edudat$TOTALEDU
+edudat1 <- edudat
+table(edudat1$highschool)
+
+edudat1 <- edudat %>%
+  select(NAME, highschool)
+edudat1
+
+
+
+## HHI####
+
+hhi_vars_gen <-c(
+  less10 = "B19001_002",
+  less15 = "B19001_003",
+  less20 = "B19001_004",
+  less25 = "B19001_005",
+  less30 = "B19001_006",
+  less35 = "B19001_007",
+  less40 = "B19001_008",
+  less45 = "B19001_009",
+  less50 = "B19001_010",
+  less60 = "B19001_011",
+  less75 = "B19001_012",
+  less100 = "B19001_013",
+  less125 = "B19001_014",
+  less150 = "B19001_015",
+  less200 = "B19001_016",
+  over200 = "B19001_017")
+
+hhi <- get_acs(geography = "state", 
+               variables = hhi_vars_gen, 
+               state = us,
+               year = 2019)
+
+hhidat <- hhi %>%
+  group_by(NAME, variable) %>%
+  summarize(Evar = sum(estimate, na.rm=TRUE))
+
+
+hhidat
+hhidat <- hhidat %>%
+  pivot_wider(names_from = variable, values_from = Evar)
+hhidat
+table(hhidat$)
+hhidat$less401k <- hhidat$less10 + hhidat$less15 + hhidat$less20 + hhidat$less25 + hhidat$less30 + hhidat$less35 + hhidat$less40
+hhidat$less40k <- hhidat$less401k
+hhidat$over100k <- hhidat$less125 + hhidat$less150 + hhidat$less200 + hhidat$over200
+
+hhidat$TOTALhhi <- hhidat$less40k + hhidat$over100k + hhidat$less45 + hhidat$less50 + hhidat$less60 + hhidat$less75 + hhidat$less100
+
+
+hhidat$less40k <- hhidat$less40k/hhidat$TOTALhhi
+hhidat$over100k <- hhidat$over100k/hhidat$TOTALhhi
+
+hhidat1  <- hhidat %>%
+  select(NAME, less40k, over100k)
+hhidat <- hhidat1
+hhidat
+
+
+
+# EMPLOYMENT DATA ####
 #Generate employment targets
 empl_vars <- c(
   employedCiv = "B23025_004",
   UnemployedCiv = "B23025_005",
   military = "B23025_006",
   notinlf = "B23025_007",
-  maleinschool = "B14002_003",
-  femaleinschool = "B14002_027"
 )
 
 #Retrieve Employment data 
 employment <- get_acs(
   geography = "state",
   variables = empl_vars,
+  state = us,
   summary_var = "B09021_001"
 )
+#Use dplyr to organize by state
+empdat <- employment %>%
+  group_by(NAME, variable) %>%
+  summarize(Evar = sum(estimate, na.rm=TRUE))
+head(empdat)
+empdat <- empdat %>%
+  pivot_wider(names_from = variable, values_from = Evar)
+head(empdat)
+#Recode variable for those not in labor force
+empdat$NotInLaborForce <-empdat$notinlf
+#Create summary variable
+empdat$Employed <- empdat$employedCiv + empdat$military
+empdat$Unemployed <- empdat$UnemployedCiv
+empdat$Total <- empdat$Employed + empdat$Unemployed + empdat$NotInLaborForce
+#Convert to Percentage not in LF
+empdat$NotInLaborForce <- empdat$NotInLaborForce/empdat$Total
+#Create new dataframe with only useful variables
+empdat1 <- empdat
+head(empdat1)
+empdat1 <- empdat1 %>%
+  select(NAME, NotInLaborForce)
+empdat <- empdat1
+
+
+
+## Combine Census data ####
+m1 <- merge(hhidat1, edudat1, by.x="NAME", by.y = "NAME")
+m2 <- merge(m1, empdat1, by.x="NAME", by.y = "NAME")
+mergedCensusdata <-  merge(m2, srdat, by.x="NAME", by.y = "NAME")
+head(mergedCensusdata)
+StateData <- mergedCensusdata
+
+
+Census <- StateData
+table(Census$NAME)
+Census$NAME <- tolower(Census$NAME)
+
+
+### TRUMP vote ####
+# Load MIT election data:       rdat <-  read_csv("1976-2020-president.csv")
+rdat <- subset(rdat, year==2020)
+
+tdat <- subset(rdat, candidate=="TRUMP, DONALD J.")
+tdat
+tdat$percent <- tdat$candidatevotes/tdat$totalvotes # Calculates percent of votes cast in 2020 for Trump
+tdat$state <- tolower(tdat$state)
+table(tdat$state)
+
+
+trumpdata <- tdat %>%
+  select(state, state_po, state_fips, percent)
+
+
+
+ddat <- merge(Census, trumpdata, by.x="NAME", by.y="state")
+
+Census <- ddat
 
