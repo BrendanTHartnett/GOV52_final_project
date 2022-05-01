@@ -1,0 +1,177 @@
+library(purrr)
+library(tidycensus)
+library(dplyr)
+
+#Census Key
+#Input uniqu Census API census_api_key("58b15c83fa9e86e3f63d5e87ca80a381fd2e748d")
+    # readRenviron("~/.Renviron")
+
+#Load all 2019 ACS variable names, labels and descriptions
+variables_2019 <- load_variables(2019, "acs5", cache = TRUE)
+
+#Make target for Race by Gender over 18
+race_vars_gen <- c(
+  WhiteMale = "B01001A_002",
+  WhiteWoman = "B01001A_017",
+  BlackMale = "B01001B_002",
+  BlackFemale = "B01001B_017",
+  AlaskanMale = "B01001C_002",
+  AlaskanFemale = "B01001C_017",
+  AsianMale = "B01001D_002",
+  AsianFemale = "B01001D_017",
+  HawaiiMale = "B01001E_002",
+  HawaiiFemale = "B01001E_017",
+  OtherMale = "B01001F_002",
+  OtherFemale = "B01001F_017",
+  TwoMale = "B01001G_002",
+  TwoFemale = "B01001G_017",
+  HispanicMale = "B01001I_002",
+  HispanicFemale = "B01001I_017"
+)
+
+#Retrieve  Data for RaceXGender over 18 at the state level
+raceXgender <- get_acs(
+  geography = "state",
+  variables = race_vars_gen,
+  summary_var = "B09021_001"
+)
+
+
+#Generate targets for ageXgender variables
+age_vars_gen <- c(
+  M1819 = "B01001_007",
+  M20 = "B01001_008",
+  M21 = "B01001_009",
+  M2224 = "B01001_010",
+  M2529 = "B01001_011",
+  M3034 = "B01001_012",
+  M3539 = "B01001_013",
+  M4044 = "B01001_014",
+  M5449 = "B01001_015",
+  M5054 = "B01001_016",
+  M5559 = "B01001_017",
+  M6061 = "B01001_018",
+  M6264 = "B01001_019",
+  M6566 = "B01001G_020",
+  M6769 = "B01001_021",
+  M7074 = "B01001_022",
+  M7579 = "B01001_023",
+  M8084 = "B01001_024",
+  M85 = "B01001_025",
+  F1819 = "B01001_031",
+  F20 = "B01001_032",
+  F21 = "B01001_033",
+  F2224 = "B01001_034",
+  F2529 = "B01001_035",
+  F3034 = "B01001_036",
+  F3539 = "B01001_037",
+  F4044 = "B01001_038",
+  F5449 = "B01001_039",
+  F5054 = "B01001_040",
+  F5559 = "B01001_041",
+  F6061 = "B01001_042",
+  F6264 = "B01001_043",
+  F6566 = "B01001_044",
+  F6769 = "B01001_045",
+  F7074 = "B01001_046",
+  F7579 = "B01001_047",
+  F8084 = "B01001_048",
+  F85 = "B01001_049"
+)
+
+#Retrieve AgeXGender data at the state level
+ageXgender <- get_acs(
+  geography = "state",
+  variables = age_vars_gen,
+  summary_var = "B09021_001"
+)
+
+
+
+#Genderate education by gender targets
+edu_vars_gen <- c(
+  Mnone = "B15002_003",
+  M4 = "B15002_004",
+  M6 = "B15002_005",
+  M8 = "B15002_006",
+  M9 = "B15002_007",
+  M10 = "B15002_008",
+  M11 = "B15002_009",
+  M12 = "B15002_010",
+  MHS = "B15002_011",
+  MC1 = "B15002_012",
+  MC2 = "B15002_013",
+  MAss = "B15002_014",
+  MBachelors = "B15002_015",
+  MMasters = "B15002_016",
+  MProf = "B15002_017",
+  MDr = "B15002_018",
+  Fnone = "B15002_020",
+  F4 = "B15002_021",
+  F6 = "B15002_022",
+  F8 = "B15002_023",
+  F9 = "B15002_024",
+  F10 = "B15002_025",
+  F11 = "B15002_026",
+  F12 = "B15002_027",
+  FHS = "B15002_028",
+  FC1 = "B15002_029",
+  FC2 = "B15002_030",
+  FAss = "B15002_031",
+  FBachelors = "B15002_032",
+  FMasters = "B15002_033",
+  FProf = "B15002_034",
+  FDr = "B15002_035"
+)
+
+#Retrieve eduXgender data at the state level
+eduXgender <- get_acs(
+  geography = "state",
+  variables = edu_vars_gen,
+  summary_var = "B09021_001"
+)
+
+
+#Generate targets for Household Income
+hhi_vars <- c(
+  L10k = "B19001_002", #L for less than
+  L15 = "B19001_003",
+  L20 = "B19001_004",
+  L25 = "B19001_005",
+  L30 = "B19001_006",
+  L35 = "B19001_007",
+  L40 = "B19001_008",
+  L45 = "B19001_009",
+  L50 = "B19001_010",
+  L60 = "B19001_011",
+  L75 = "B19001_012",
+  L100 = "B19001_013",
+  L125 = "B19001_014",
+  L150 = "B19001_015",
+  L200 = "B19001_016",
+  O200 = "B19001_017" #O for over
+)
+
+#Retrieve household income data at state level
+hhi <- get_acs(
+  geography = "state",
+  variables = hhi_vars,
+  summary_var = "B09021_001"
+)
+
+#Generate employment targets
+empl_vars <- c(
+  employedCiv = "B23025_004",
+  UnemployedCiv = "B23025_005",
+  military = "B23025_006",
+  notinlf = "B23025_007",
+  maleinschool = "B14002_003",
+  femaleinschool = "B14002_027"
+)
+
+#Retrieve Employment data 
+employment <- get_acs(
+  geography = "state",
+  variables = empl_vars,
+  summary_var = "B09021_001"
+)
