@@ -1,0 +1,87 @@
+library(sf)
+library(ggplot2)
+#### Calculate Error for Congress####
+
+CongressDat <- read_sf("CongressionalShapefile_v1.shp")
+
+table(CongressDat$FID_)
+#Test for if, when controlling for Trump vote, the individual electoral unit significantly effects prediction 
+summary(lm(cllpr22 ~ TRUMP + FID_, data = CongressDat))
+#Congressional District is insignificant after controlling for Trump
+table(CongressDat$cllpr22)
+
+CongressDat$crossref <- CongressDat$TRUMP*.78
+CongressDat$error <- CongressDat$crossref - CongressDat$cllpr22
+table(CongressDat$error)
+CongressDat$error <- abs(CongressDat$error)
+mean(CongressDat$error)
+median(CongressDat$error)
+#Median error: .08, mean .09
+
+CongressDat$error <- CongressDat$error*100
+CongressDat$crossref <- CongressDat$crossref*100
+library(ggplot2)
+ggplot(CongressDat, aes(x=crossref, y=error)) + geom_point() + geom_smooth(method="lm", colour="black") + theme_minimal() + ylab("Absolute Value of Predicted Value minus .78(Trump Vote)") + xlab("Percent voting for Trump")
+
+CongressDat$crossref <- NA
+CongressDat$crossref <- CongressDat$TRUMP*.78
+CongressDat$rawerror <- CongressDat$crossref - CongressDat$cllpr22
+table(CongressDat$rawerror)
+median(CongressDat$rawerror)
+median(CongressDat$rawerror)
+CongressDat$rawerror <- CongressDat$rawerror*100
+CongressDat$crossref <- CongressDat$crossref*100
+library(ggplot2)
+ggplot(CongressDat, aes(x=crossref, y=rawerror)) + geom_point() + geom_smooth(method="lm", colour="black") + theme_minimal() + ylab("Predicted Value minus .78(Trump Vote)") + xlab("Percent voting for Trump")
+
+
+
+
+## Calculate Error for Senate ####
+
+
+SenateDat <- read_sf("USStatesShapefile_v1.shp")
+summary(lm(cllprd2 ~ percent + FID_, data = SenateDat))
+SenateDat$crossref <- SenateDat$percent*.78
+SenateDat$error <- SenateDat$crossref - SenateDat$cllprd2
+SenateDat$error <- abs(SenateDat$error)
+table(SenateDat$error)
+median(SenateDat$error)
+median(SenateDat$error)
+SenateDat$error <- SenateDat$error*100
+SenateDat$crossref <- SenateDat$crossref*100
+library(ggplot2)
+ggplot(SenateDat, aes(x=crossref, y=error)) + geom_point() + geom_smooth(method="lm", colour="black") + theme_minimal() + ylab("Absolute Value of Predicted Value minus .78(Trump Vote)") + xlab("Percent voting for Trump")
+
+
+SenateDat$crossref <- SenateDat$percent*.78
+SenateDat$rawerror <- SenateDat$crossref - SenateDat$cllprd2
+table(SenateDat$rawerror)
+median(SenateDat$rawerror)
+median(SenateDat$rawerror)
+SenateDat$rawerror <- SenateDat$rawerror*100
+SenateDat$crossref <- SenateDat$crossref*100
+library(ggplot2)
+ggplot(SenateDat, aes(x=crossref, y=rawerror)) + geom_point() + geom_smooth(method="lm", colour="black") + theme_minimal() + ylab("Predicted Value minus .78(Trump Vote)") + xlab("Percent voting for Trump")
+
+
+
+
+
+
+
+## Calculate Error for State Senate Districts ####
+StateSenates <- Census
+StateSenates$crossref <- StateSenates$TRUMP*.78
+StateSenates$rawerror <- StateSenates$crossref - StateSenates$cellpred22
+median(StateSenates$rawerror)
+mean(StateSenates$rawerror)
+
+StateSenates$rawerror <- abs(StateSenates$rawerror)
+median(StateSenates$rawerror)
+#Median: .061
+mean(StateSenates$rawerror)
+#Mean: .09
+
+
+ggplot(StateSenates, aes(x=crossref*100, y=rawerror*100)) + geom_point() + geom_smooth(method="lm", colour="black") + theme_minimal() + ylab("Absolute Value of Predicted Value minus .78(Trump Vote)") + xlab("Percent voting for Trump")
